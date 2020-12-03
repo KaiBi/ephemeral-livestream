@@ -14,7 +14,7 @@ Write-Host 'https://cloud.digitalocean.com/account/api/tokens'
 Write-Host 'Make sure that the token has write access.'
 while ($True) {
     $DOApiToken = (Read-Host 'Please enter your token (or press Ctrl-C to exit): ').ToLower()
-    if (!($DOToken -match '^[a-f0-9]{64}$')) {
+    if (!($DOApiToken -match '^[a-f0-9]{64}$')) {
         Write-Host 'Token does not seem valid. Tokens consist of 64 hexadecimal characters.'
         continue
     }
@@ -22,7 +22,9 @@ while ($True) {
         Authorization = "Bearer ${DOApiToken}";
         'Content-Type' = 'application/json'
     }
-    $GetUserInformationResponse = Invoke-RestMethod -Uri 'https://api.digitalocean.com/v2/account' -Method Get -Headers $DOHeaders
+    try {
+        $GetUserInformationResponse = Invoke-RestMethod -Uri 'https://api.digitalocean.com/v2/account' -Method Get -Headers $DOHeaders
+    } catch {}
     if ($GetUserInformationResponse.account.status -eq 'active') {
         break
     }
@@ -38,9 +40,17 @@ Write-Host 'So, if your domain is "live.example.com" and points to 1.2.3.4, then
 Write-Host 'must also be set and point to this ip address.'
 while ($True) {
     $Domain = Read-Host 'Please enter the domain name (or press Ctrl-C to exit): '
-    $DomainIP = (Resolve-DnsName -Name $Domain -DnsOnly).IPAddress
+    try {
+        $DomainIP = (Resolve-DnsName -Name $Domain -DnsOnly).IPAddress
+    } catch {}
+    if ($DomainIP -eq '') {
+        Write-Host 'Could not resolve this domain'
+        continue
+    }
     $RandomSubdomain = (-join ((0x61..0x7A) | Get-Random -Count 10 | ForEach-Object -Process {[char]$_})) + '.' + $Domain
-    $SubdomainIP = (Resolve-DnsName -Name $RandomSubdomain -DnsOnly).IPAddress
+    try {
+        $SubdomainIP = (Resolve-DnsName -Name $RandomSubdomain -DnsOnly).IPAddress
+    } catch {}
     if ($DomainIP -ne $SubdomainIP) {
         Write-Host 'The IP address of a random subdomain did not match the IP of the domain.'
         Write-Host 'Please make sure that the wildcard DNS is set up correctly.'
@@ -48,7 +58,7 @@ while ($True) {
     }
     try {
         $GetFloatingIPResponse = Invoke-RestMethod -Uri "https://api.digitalocean.com/v2/floating_ips/${DomainIP}" -Method Get -Headers $DOHeaders
-        if ($GetFloatingIPResponse.floating_ip.locked -ne 'False') {
+        if ($GetFloatingIPResponse.floating_ip.locked -ne $False) {
             throw
         }
     } catch {
@@ -127,3 +137,4 @@ $Config = @{
 $Config | ConvertTo-Json | Out-File -FilePath '.secret/credentials.json'
 
 Write-Host 'All configuration files have been written to the .secret folder. The setup has been finished.'
+Read-Host ''

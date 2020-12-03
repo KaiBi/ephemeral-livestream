@@ -9,8 +9,6 @@ Quickly set up and tear down a livestream environment for a limited amount of vi
 
 # Setup
 
-(This is work in progress. You currently have to edit the credentials.json file manually.)
-
 Run `setup.cmd`. This will ask a number of questions and create files in the `.secret` subfolder. These files contain secret keys and values and should not be shared. To run the script on a machine without docker, copy this subfolder to the target.
 
 # Usage

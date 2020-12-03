@@ -5,6 +5,8 @@ set -euo pipefail
 apt-get update
 apt-get install -y openssh-server putty-tools
 
+mkdir -p ../.secret/
+
 rm -f ../.secret/ssh_host_*
 cp -a /etc/ssh/ssh_host_* ../.secret/
 
