@@ -16,6 +16,7 @@ $DOApiToken = $Config.DOApiToken
 $DOSSHKeyFingerprint = $Config.DOSSHKeyFingerprint
 $FloatingIP = $Config.FloatingIP
 $ScriptVersion = $Config.ScriptVersion
+$GithubUserName = $Config.GithubUserName
 $GithubRepositoryName = $Config.GithubRepositoryName
 $DomainName = $Config.DomainName
 $DODropletTag = $Config.DODropletTag
