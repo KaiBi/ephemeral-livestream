@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Livestream demo</title>
+    <script src="clappr.min.js"></script>
+    <script src="level-selector.min.js"></script>
+    <style>
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        html {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ddd;
+            box-sizing: border-box;
+        }
+        main {
+            width: 640px;
+            height: 360px;
+            background: #aaa;
+        }
+        p {
+            width: 80%;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+        }
+        .spinner {
+            display: block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1.5s ease-in-out infinite;
+            -webkit-animation: spin 1.5s ease-in-out infinite;
+            margin: auto;
+        }
+        @keyframes spin {
+            to { -webkit-transform: rotate(360deg); }
+        }
+        @-webkit-keyframes spin {
+            to { -webkit-transform: rotate(360deg); }
+        }
+    </style>
+  </head>
+  <body>
+    <main id="livestream">
+        <div id="loadingMessage">
+            <p>There is no livestream active at the moment. This page will refresh automatically in <span id="countdown">xx</span> seconds.</p>
+            <div class="spinner"></div>
+        </div>
+    </main>
+    <script>
+        function initializePlayer() {
+            document.getElementById('loadingMessage').remove();
+            var player = new Clappr.Player({
+                source: "/live/stream.m3u8",
+                parentId: "#livestream",
+                language: "de-DE",
+                poster: "/poster.jpg",
+                plugins: [LevelSelector],
+                levelSelectorConfig: {
+                    title: "Qualität",
+                    labels: {
+                        2: 'Hoch',
+                        1: 'Mittel',
+                        0: 'Niedrig'
+                    }
+                }
+            });
+        }
+      
+        async function streamSourceCanBeFetched() {
+            try {
+                const response = await fetch('/live/stream.m3u8', {method: 'HEAD'});
+                return response.ok;
+            } catch (e) {
+                return false;
+            }
+        }
+      
+        const timer = async (countdown) => {
+            if (countdown == 1) {
+                if (await streamSourceCanBeFetched()) {
+                    initializePlayer();
+                    return;
+                }
+            }
+            const nextCountdown = countdown === 1
+                ? 10
+                : countdown - 1;
+            document.getElementById('countdown').innerHTML = nextCountdown;
+            setTimeout(() => timer(nextCountdown), 1000);
+        }
+
+        setTimeout(() => timer(1), 1000);
+      </script>
+  </body>
+</html>
