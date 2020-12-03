@@ -33,18 +33,18 @@ try {
         Write-Host 'Script is up to date.'
     } else {
         Write-Host 'New script version available. Performing update ...'
-        Invoke-WebRequest -Uri "https://github.com/${GithubUserName}/${GithubRepositoryName}/archive/master.zip" -UseBasicParsing -OutFile 'master.zip'
+        Invoke-WebRequest -Uri "https://github.com/${GithubUserName}/${GithubRepositoryName}/archive/main.zip" -UseBasicParsing -OutFile 'main.zip'
         $watchdogProcess.Kill()
         $Config.ScriptVersion = $LatestCommitHash
         $Config | ConvertTo-Json | Out-File -FilePath '.secret/credentials.json'
         Start-Sleep -Seconds 3
         Start-Process -FilePath 'powershell' -ArgumentList "
             Start-Sleep -Seconds 1
-            Get-ChildItem -Exclude .secret,master.zip . | Remove-Item -Recurse -Force
-            Expand-Archive -Path master.zip -DestinationPath .
-            Remove-Item -Force master.zip
-            Move-Item -Force -Path '${GithubRepositoryName}-master/*' -Destination .
-            Remove-Item -Force -Recurse '${GithubRepositoryName}-master'
+            Get-ChildItem -Exclude .secret,main.zip . | Remove-Item -Recurse -Force
+            Expand-Archive -Path main.zip -DestinationPath .
+            Remove-Item -Force main.zip
+            Move-Item -Force -Path '${GithubRepositoryName}-main/*' -Destination .
+            Remove-Item -Force -Recurse '${GithubRepositoryName}-main'
             Start-Process -FilePath 'powershell' -ArgumentList '-c src/start.ps1'"
         Exit
     }
