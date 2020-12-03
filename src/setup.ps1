@@ -116,7 +116,7 @@ while ($True) {
         continue
     }
     try {
-        Invoke-RestMethod -Uri "https://api.digitalocean.com/v2/account/keys/${SSHKeyFingerprint}" -Method Get -Headers @DOHeaders
+        Invoke-RestMethod -Uri "https://api.digitalocean.com/v2/account/keys/${SSHKeyFingerprint}" -Method Get -Headers $DOHeaders
     } catch {
         Write-Host 'A key with this fingerprint does not seem to exist on DigitalOcean.'
         continue
