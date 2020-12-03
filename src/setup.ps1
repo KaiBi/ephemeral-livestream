@@ -93,7 +93,7 @@ while ($True) {
     }
     $GithubRepo = Read-Host 'Please enter the github repository (or press Ctrl-C to exit): '
     try {
-        Invoke-RestMethod -Uri "https://api.github.com/repos/${GithubUser}/${GithubRepo}/commits/main" -Method Get
+        Invoke-RestMethod -Uri "https://api.github.com/repos/${GithubUser}/${GithubRepo}/commits/main" -Method Get | Out-Null
     } catch {
         Write-Host 'Could not query the commits on that repository.'
         Write-Host 'Either it does not exist or we have hit the api rate limit and need to try again later.'
