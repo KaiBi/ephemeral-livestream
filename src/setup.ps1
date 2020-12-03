@@ -137,4 +137,5 @@ $Config = @{
 $Config | ConvertTo-Json | Out-File -FilePath '.secret/credentials.json'
 
 Write-Host 'All configuration files have been written to the .secret folder. The setup has been finished.'
-Read-Host ''
+Write-Host 'This window will close in 60 seconds.'
+Start-Sleep -Seconds 60

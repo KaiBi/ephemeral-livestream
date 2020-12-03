@@ -27,7 +27,7 @@ Write-Host '. ok'
 Write-Host '========== Check for Updates'
 
 try {
-    $CheckLatestUpdateResponse = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/${GithubUserName}/${GithubRepositoryName}/commits/master"
+    $CheckLatestUpdateResponse = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/${GithubUserName}/${GithubRepositoryName}/commits/main"
     $LatestCommitHash = $CheckLatestUpdateResponse.sha
     if ($ScriptVersion -eq $LatestCommitHash) {
         Write-Host 'Script is up to date.'
