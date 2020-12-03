@@ -88,8 +88,10 @@ $CreateDropletRequestBody = @{
     region = 'fra1'
     size = 'c-4'
     tags = $DODropletTag
-    ssh_keys = @( $DOSSHKeyFingerprint )
     user_data = $InitScript
+}
+if ($DOSSHKeyFingerprint) {
+    $CreateDropletRequestBody['ssh_keys'] = @( $DOSSHKeyFingerprint )
 }
 $CreateDropletResponse = ConvertTo-Json $CreateDropletRequestBody | Invoke-RestMethod -Uri 'https://api.digitalocean.com/v2/droplets' -Method Post -Headers $DOHeaders
 $CreateDropletActionUri = $CreateDropletResponse.links.actions[0].href
@@ -180,7 +182,7 @@ $SSHProcess = Start-Process -PassThru -WindowStyle Hidden -FilePath 'build/plink
 Start-Sleep -Seconds 2
 $SSHProcessId = $SSHProcess.Id
 Write-Host ". Process id is ${SSHProcessId}"
-If (!(Get-Process -Id $SSHProcessId -ErrorAction SilentlyContinue)) {
+if (!(Get-Process -Id $SSHProcessId -ErrorAction SilentlyContinue)) {
     Write-Host '. Process is inactive. There seems to be an error. This is unusual. You can restart the script to try again, but it is very likely that you will have to debug.'
     Start-Sleep -Seconds 10
     Exit
