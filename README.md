@@ -5,7 +5,7 @@ Quickly set up and tear down a livestream environment for a limited amount of vi
 1. An account with DigitalOcean. If you do not have one you can use this [Affiliate Link](https://m.do.co/c/da5afaa104b4) to get some starting credits.
 2. Control over the DNS for a domain or subdomain. You need the capability to set the DNS A record for the domain and a wildcard for all subdomains of that domain. Example: live.example.org and *.live.example.org
 3. A working docker installation is required for generating configuration files. Only the generated files are required for running the script. So you can do the setup on one machine with docker and then copy the files to another machine and run the script there without docker.
-4. Powershell (I think at least version 5, but I have not tested it).
+4. Powershell (preinstalled or modern - I have tested 5.1 and 7.1 on Windows 10)
 
 # Setup
 

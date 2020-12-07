@@ -1,9 +1,15 @@
 $ErrorActionPreference = 'Stop'
+$PowershellExecutable = 'powershell'
+try {
+    if (Get-Command 'pwsh') {
+        $PowershellExecutable = 'pwsh'
+    }
+} catch {}
 
 Write-Host '========== Spawn Cleanup Watchdog'
 
 $currentProcessId = [System.Diagnostics.Process]::GetCurrentProcess().Id
-$watchdogProcess = Start-Process -PassThru -WindowStyle Hidden -FilePath 'powershell' -ArgumentList "-c src/watchdog.ps1 ${currentProcessId}"
+$watchdogProcess = Start-Process -PassThru -WindowStyle Hidden -FilePath $PowershellExecutable -ArgumentList "-c src/watchdog.ps1 ${currentProcessId}"
 Write-Host '. ok'
 
 
@@ -39,14 +45,14 @@ try {
         $Config.ScriptVersion = $LatestCommitHash
         $Config | ConvertTo-Json | Out-File -FilePath '.secret/credentials.json'
         Start-Sleep -Seconds 3
-        Start-Process -FilePath 'powershell' -ArgumentList "
+        Start-Process -FilePath $PowershellExecutable -ArgumentList "
             Start-Sleep -Seconds 1
             Get-ChildItem -Exclude .secret,main.zip . | Remove-Item -Recurse -Force
             Expand-Archive -Path main.zip -DestinationPath .
             Remove-Item -Force main.zip
             Move-Item -Force -Path '${GithubRepositoryName}-main/*' -Destination .
             Remove-Item -Force -Recurse '${GithubRepositoryName}-main'
-            Start-Process -FilePath 'powershell' -ArgumentList '-c src/start.ps1'"
+            Start-Process -FilePath ${PowershellExecutable} -ArgumentList '-c src/start.ps1'"
         Exit
     }
 } catch {
@@ -193,7 +199,7 @@ if (!(Get-Process -Id $SSHProcessId -ErrorAction SilentlyContinue)) {
 
 Write-Host '========== Start fetching the rtmp logs'
 
-$LoggingProcess = Start-Process -PassThru -WindowStyle Hidden -FilePath 'powershell' -ArgumentList "-c src/fetchLogs.ps1 $currentProcessId $RandomUnboundLocalPortNumber"
+$LoggingProcess = Start-Process -PassThru -WindowStyle Hidden -FilePath $PowershellExecutable -ArgumentList "-c src/fetchLogs.ps1 $currentProcessId $RandomUnboundLocalPortNumber"
 Start-Sleep -Seconds 2
 $LoggingProcessId = $LoggingProcess.Id
 Write-Host ". Process id is ${LoggingProcessId}"
@@ -202,7 +208,7 @@ Write-Host ". Process id is ${LoggingProcessId}"
 
 Write-Host '========== Restart Watchdog'
 
-Start-Process -WindowStyle Hidden -FilePath 'powershell' -ArgumentList "-c src/watchdog.ps1 $currentProcessId $SSHProcessId $LoggingProcessId"
+Start-Process -WindowStyle Hidden -FilePath $PowershellExecutable -ArgumentList "-c src/watchdog.ps1 $currentProcessId $SSHProcessId $LoggingProcessId"
 $watchdogProcess.Kill()
 Write-host '. ok'
 
